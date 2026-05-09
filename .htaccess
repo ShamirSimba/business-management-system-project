@@ -1,0 +1,18 @@
+Options -Indexes
+RewriteEngine On
+
+# Block direct access to sensitive folders
+<FilesMatch "\.(sql|log|env)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /BMS/
+
+    # Route API requests through api/index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+</IfModule>
