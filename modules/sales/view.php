@@ -16,7 +16,7 @@ if (!$sale) {
 $items = $sale['items'] ?? [];
 require_once __DIR__ . '/../../includes/header.php';
 require_once __DIR__ . '/../../includes/sidebar.php';
-require_once __DIR__ . '/../../includes/topbar.php';
+// require_once __DIR__ . '/../../includes/topbar.php';
 ?>
         <div class="container">
             <div class="flex justify-between align-center mb-3">
@@ -75,8 +75,8 @@ require_once __DIR__ . '/../../includes/topbar.php';
             
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                 <a href="receipt.php?id=<?= $sale['id'] ?>" class="btn btn-primary" target="_blank">Print Receipt</a>
-                <a href="index.php?business_id=<?= $current_business_id ?>" class="btn btn-secondary">Back to Sales</a>
+                <a href="index.php?business_id=<?= $current_business_id ?>" class="btn btn-primary">Back to Sales</a>
             </div>
         </div>
 
-<?php require_once __DIR__ . '/../../includes/footer.php'; ?>// View sale page for BMS
+<?php require_once __DIR__ . '/../../includes/footer.php'; ?>

@@ -63,4 +63,4 @@ require_once __DIR__ . '/../../includes/header.php';
     <button class="btn btn-primary print-btn" onclick="window.print()">Print</button>
 </div>
 </body>
-</html>// Sales receipt page for BMS
+</html>

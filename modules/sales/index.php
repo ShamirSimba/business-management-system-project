@@ -33,7 +33,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
             </div>
             <form method="GET" class="card mb-3">
                 <input type="hidden" name="business_id" value="<?= $current_business_id ?>">
-                <div class="flex gap-1 align-end">
+                <div class="d-flex align-items-center gap-1">
                     <div class="form-group" style="flex: 1;">
                         <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem;">From Date</label>
                         <input type="date" name="from" value="<?= htmlspecialchars($from) ?>" class="form-control">
@@ -51,7 +51,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                             <option value="mobile" <?= $payment_method=='mobile'?'selected':'' ?>>Mobile Money</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-secondary">Filter</button>
+                    <button type="submit" class="btn btn-primary">Filter</button>
                 </div>
             </form>
             <div class="table-wrapper">

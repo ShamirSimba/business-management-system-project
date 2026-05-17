@@ -179,8 +179,8 @@ require_once __DIR__ . '/../../includes/sidebar.php';
 
             <section class="grid mt-3" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                 <a href="../sales/create.php" class="btn btn-primary">Record Sale</a>
-                <a href="../inventory/create.php" class="btn btn-success">Add Product</a>
-                <a href="../investments/create.php" class="btn btn-warning">Add Investment</a>
+                <a href="../inventory/create.php" class="btn btn-primary">Add Product</a>
+                <a href="../investments/create.php" class="btn btn-primary">Add Investment</a>
             </section>
         </div>
     </main>
