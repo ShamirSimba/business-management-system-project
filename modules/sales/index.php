@@ -2,17 +2,16 @@
 require_once __DIR__ . '/../../config/constants.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../classes/Sale.php';
+require_once __DIR__ . '/../../classes/Business.php';
 require_once __DIR__ . '/../../auth/session.php';
 $page_title = 'Sales History';
 $saleModel = new Sale($conn);
+$businessModel = new Business($conn);
 
-// Get user's business_id
-$stmt = $conn->prepare("SELECT id FROM businesses WHERE user_id = ? LIMIT 1");
-$stmt->bind_param("i", $_SESSION['user_id']);
-$stmt->execute();
-$business = $stmt->get_result()->fetch_assoc();
-$business_id = $business['id'] ?? null;
-$stmt->close();
+// Get all user's businesses
+$businesses = $businessModel->getAll($current_user['id']);
+$current_business_id = isset($_GET['business_id']) ? intval($_GET['business_id']) : ($businesses[0]['id'] ?? null);
+$business_id = $current_business_id;
 
 $from = $_GET['from'] ?? date('Y-m-01');
 $to = $_GET['to'] ?? date('Y-m-d');
@@ -25,23 +24,35 @@ require_once __DIR__ . '/../../includes/sidebar.php';
         <div class="container">
             <div class="flex justify-between align-center mb-3">
                 <h2>Sales History</h2>
-                <a href="create.php" class="btn btn-primary">Record New Sale</a>
+                <a href="create.php?business_id=<?= $current_business_id ?>" class="btn btn-primary">Record New Sale</a>
             </div>
             <div class="grid mb-3" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
                 <div class="kpi-card"><div class="kpi-label">Today's Revenue</div><div class="kpi-value">TZS <?= number_format($summary['today'],2) ?></div></div>
                 <div class="kpi-card"><div class="kpi-label">This Month</div><div class="kpi-value">TZS <?= number_format($summary['month'],2) ?></div></div>
                 <div class="kpi-card"><div class="kpi-label">Total Sales</div><div class="kpi-value"><?= $summary['count'] ?></div></div>
             </div>
-            <form method="GET" class="flex gap-1 mb-2">
-                <input type="date" name="from" value="<?= htmlspecialchars($from) ?>" class="form-control">
-                <input type="date" name="to" value="<?= htmlspecialchars($to) ?>" class="form-control">
-                <select name="payment_method" class="form-control" style="max-width:180px;">
-                    <option value="">All Methods</option>
-                    <option value="cash" <?= $payment_method=='cash'?'selected':'' ?>>Cash</option>
-                    <option value="card" <?= $payment_method=='card'?'selected':'' ?>>Card</option>
-                    <option value="mobile" <?= $payment_method=='mobile'?'selected':'' ?>>Mobile</option>
-                </select>
-                <button type="submit" class="btn btn-secondary">Filter</button>
+            <form method="GET" class="card mb-3">
+                <input type="hidden" name="business_id" value="<?= $current_business_id ?>">
+                <div class="flex gap-1 align-end">
+                    <div class="form-group" style="flex: 1;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem;">From Date</label>
+                        <input type="date" name="from" value="<?= htmlspecialchars($from) ?>" class="form-control">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem;">To Date</label>
+                        <input type="date" name="to" value="<?= htmlspecialchars($to) ?>" class="form-control">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem;">Payment Method</label>
+                        <select name="payment_method" class="form-control">
+                            <option value="">All Methods</option>
+                            <option value="cash" <?= $payment_method=='cash'?'selected':'' ?>>Cash</option>
+                            <option value="card" <?= $payment_method=='card'?'selected':'' ?>>Card</option>
+                            <option value="mobile" <?= $payment_method=='mobile'?'selected':'' ?>>Mobile Money</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Filter</button>
+                </div>
             </form>
             <div class="table-wrapper">
                 <table>
@@ -78,7 +89,8 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                                     <td><span class="badge badge-info"><?= ucfirst($sale['payment_method']) ?></span></td>
                                     <td><span class="badge <?= $sale['status']=='completed'?'badge-success':'badge-danger' ?>"><?= ucfirst($sale['status']) ?></span></td>
                                     <td>
-                                        <a href="view.php?id=<?= $sale['id'] ?>" class="btn btn-success">View</a>
+                                        <a href="view.php?id=<?= $sale['id'] ?>&business_id=<?= $current_business_id ?>" class="btn btn-success btn-sm">View</a>
+                                        <a href="receipt.php?id=<?= $sale['id'] ?>" class="btn btn-info btn-sm" target="_blank">Receipt</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

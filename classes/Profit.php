@@ -48,12 +48,14 @@ class Profit {
     public function getMonthlyBreakdown($business_id, $year) {
         $breakdown = [];
         $months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        $month_shorts = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         for ($month = 1; $month <= 12; $month++) {
             $from = sprintf('%04d-%02d-01', $year, $month);
             $to = date('Y-m-t', strtotime($from));
             $profit_data = $this->calculate($business_id, $from, $to);
             $breakdown[] = [
                 'month_name' => $months[$month - 1],
+                'month_short' => $month_shorts[$month - 1],
                 'revenue' => $profit_data['revenue'] ?? 0,
                 'cogs' => $profit_data['cogs'] ?? 0,
                 'expenses' => $profit_data['expenses'] ?? 0,

@@ -6,13 +6,16 @@ require_once __DIR__ . '/../../auth/session.php';
 $page_title = 'Profit & Analytics';
 $profitModel = new Profit($conn);
 
-// Get user's business_id
+// Get businesses for current user
 $stmt = $conn->prepare("SELECT id FROM businesses WHERE user_id = ? LIMIT 1");
 $stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
 $business = $stmt->get_result()->fetch_assoc();
-$business_id = $business['id'] ?? null;
+$default_business_id = $business['id'] ?? null;
 $stmt->close();
+
+// Get business_id from URL parameter, or use default
+$business_id = isset($_GET['business_id']) ? intval($_GET['business_id']) : $default_business_id;
 
 $year = $_GET['year'] ?? date('Y');
 $from = "$year-01-01";
@@ -95,7 +98,7 @@ include_once '../../includes/layout-start.php';
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.getElementById('year-select').addEventListener('change', function() {
-    window.location.href = '?year=' + this.value;
+    window.location.href = '?business_id=<?= $business_id ?>&year=' + this.value;
 });
 
 // Profit trend data

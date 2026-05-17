@@ -3,20 +3,23 @@ require_once __DIR__ . '/../../config/constants.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../classes/Sale.php';
 require_once __DIR__ . '/../../auth/session.php';
-require_once __DIR__ . '/../../includes/header.php';
 $saleModel = new Sale($conn);
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $sale = $saleModel->getById($id);
-if (!$sale) die('Sale not found.');
+if (!$sale) {
+    die('Sale not found.');
+}
 $items = $sale['items'] ?? [];
 
-// Get business name
+// Get business name and user info
 $stmt = $conn->prepare("SELECT b.name FROM businesses b JOIN sales s ON b.id = s.business_id WHERE s.id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $business_result = $stmt->get_result()->fetch_assoc();
-$business_name = $business_result['name'] ?? 'Business';
+$business_name = $business_result['name'] ?? APP_NAME;
 $stmt->close();
+
+require_once __DIR__ . '/../../includes/header.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,7 +57,7 @@ $stmt->close();
             <?php endforeach; ?>
         </tbody>
     </table>
-    <div class="total">Total: TZS <?= number_format($sale['total'],2) ?></div>
+    <div class="total">Total: TZS <?= number_format($sale['total_amount'],2) ?></div>
     <div>Payment: <?= ucfirst($sale['payment_method']) ?></div>
     <div class="thankyou">Thank you for your purchase!</div>
     <button class="btn btn-primary print-btn" onclick="window.print()">Print</button>

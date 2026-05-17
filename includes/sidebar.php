@@ -4,14 +4,17 @@ if (!defined('BASE_URL')) {
 }
 $base_path = parse_url(BASE_URL, PHP_URL_PATH) ?: '';
 $current_uri = $_SERVER['REQUEST_URI'] ?? '';
+
+// Build navigation items with business_id parameter if available
+$bid_param = (isset($current_business_id) && $current_business_id) ? '?business_id=' . $current_business_id : '';
 $nav_items = [
-    ['label' => 'Dashboard', 'href' => BASE_URL . '/modules/dashboard/index.php', 'pattern' => '/modules/dashboard/', 'icon' => 'ri-dashboard-line'],
+    ['label' => 'Dashboard', 'href' => BASE_URL . '/modules/dashboard/index.php' . $bid_param, 'pattern' => '/modules/dashboard/', 'icon' => 'ri-dashboard-line'],
     ['label' => 'Businesses', 'href' => BASE_URL . '/modules/businesses/index.php', 'pattern' => '/modules/businesses/', 'icon' => 'ri-briefcase-line'],
-    ['label' => 'Investments', 'href' => BASE_URL . '/modules/investments/index.php', 'pattern' => '/modules/investments/', 'icon' => 'ri-line-chart-line'],
-    ['label' => 'Inventory', 'href' => BASE_URL . '/modules/inventory/index.php', 'pattern' => '/modules/inventory/', 'icon' => 'ri-box-3-line'],
-    ['label' => 'Sales', 'href' => BASE_URL . '/modules/sales/index.php', 'pattern' => '/modules/sales/', 'icon' => 'ri-shopping-cart-line'],
-    ['label' => 'Profits', 'href' => BASE_URL . '/modules/profits/index.php', 'pattern' => '/modules/profits/', 'icon' => 'ri-money-dollar-circle-line'],
-    ['label' => 'Reports', 'href' => BASE_URL . '/modules/reports/index.php', 'pattern' => '/modules/reports/', 'icon' => 'ri-file-chart-line'],
+    ['label' => 'Investments', 'href' => BASE_URL . '/modules/investments/index.php' . $bid_param, 'pattern' => '/modules/investments/', 'icon' => 'ri-line-chart-line'],
+    ['label' => 'Inventory', 'href' => BASE_URL . '/modules/inventory/index.php' . $bid_param, 'pattern' => '/modules/inventory/', 'icon' => 'ri-box-3-line'],
+    ['label' => 'Sales', 'href' => BASE_URL . '/modules/sales/index.php' . $bid_param, 'pattern' => '/modules/sales/', 'icon' => 'ri-shopping-cart-line'],
+    ['label' => 'Profits', 'href' => BASE_URL . '/modules/profits/index.php' . $bid_param, 'pattern' => '/modules/profits/', 'icon' => 'ri-money-dollar-circle-line'],
+    ['label' => 'Reports', 'href' => BASE_URL . '/modules/reports/index.php' . $bid_param, 'pattern' => '/modules/reports/', 'icon' => 'ri-file-chart-line'],
 ];
 ?>
 <aside class="sidebar">

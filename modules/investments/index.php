@@ -26,8 +26,8 @@ require_once __DIR__ . '/../../includes/sidebar.php';
 			<div class="flex justify-between align-center mb-3">
 				<h2>Investments & Expenses</h2>
 				<div class="flex gap-1">
-					<a href="create.php?type=capital" class="btn btn-success">Add Investment</a>
-					<a href="create.php?type=expense" class="btn btn-warning">Add Expense</a>
+					<a href="create.php?business_id=<?= $current_business_id ?>&type=capital" class="btn btn-success">Add Investment</a>
+					<a href="create.php?business_id=<?= $current_business_id ?>&type=expense" class="btn btn-warning">Add Expense</a>
 				</div>
 			</div>
 			<div class="grid mb-3" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
@@ -62,10 +62,11 @@ require_once __DIR__ . '/../../includes/sidebar.php';
 									<td>TZS <?= number_format($inv['amount'], 2) ?></td>
 									<td><?= htmlspecialchars($inv['note']) ?></td>
 									<td>
-										<a href="edit.php?id=<?= $inv['id'] ?>" class="btn btn-success">Edit</a>
-										<form action="../../handlers/investment_handler.php" method="POST" style="display:inline;">
-											<input type="hidden" name="action" value="delete">
-											<input type="hidden" name="id" value="<?= $inv['id'] ?>">
+								<a href="edit.php?id=<?= $inv['id'] ?>&business_id=<?= $current_business_id ?>" class="btn btn-success">Edit</a>
+								<form action="../../handlers/investment_handler.php" method="POST" style="display:inline;">
+									<input type="hidden" name="action" value="delete">
+									<input type="hidden" name="id" value="<?= $inv['id'] ?>">
+									<input type="hidden" name="business_id" value="<?= $current_business_id ?>">
 											<button type="submit" class="btn btn-danger" data-confirm-delete>Delete</button>
 										</form>
 									</td>

@@ -2,17 +2,16 @@
 require_once __DIR__ . '/../../config/constants.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../classes/Product.php';
+require_once __DIR__ . '/../../classes/Business.php';
 require_once __DIR__ . '/../../auth/session.php';
 $page_title = 'Inventory Report';
 $productModel = new Product($conn);
+$businessModel = new Business($conn);
 
-// Get user's business_id
-$stmt = $conn->prepare("SELECT id FROM businesses WHERE user_id = ? LIMIT 1");
-$stmt->bind_param("i", $_SESSION['user_id']);
-$stmt->execute();
-$business = $stmt->get_result()->fetch_assoc();
-$business_id = $business['id'] ?? null;
-$stmt->close();
+// Get all user's businesses
+$businesses = $businessModel->getAll($current_user['id']);
+$current_business_id = isset($_GET['business_id']) ? intval($_GET['business_id']) : ($businesses[0]['id'] ?? null);
+$business_id = $current_business_id;
 
 $category_filter = $_GET['category'] ?? '';
 $products = isset($_GET['category']) !== false ? $productModel->getAll($business_id, $category_filter) : [];
@@ -28,6 +27,7 @@ require_once __DIR__ . '/../../includes/topbar.php';
         <div class="container">
             <h2>Inventory Report</h2>
             <form method="GET" class="card mb-3">
+                <input type="hidden" name="business_id" value="<?= $current_business_id ?>">
                 <div class="flex gap-1 align-end">
                     <div class="form-group">
                         <label>Category</label>

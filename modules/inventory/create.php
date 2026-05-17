@@ -2,17 +2,16 @@
 require_once __DIR__ . '/../../config/constants.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../classes/Product.php';
+require_once __DIR__ . '/../../classes/Business.php';
 require_once __DIR__ . '/../../auth/session.php';
 $page_title = 'Add Product';
 $productModel = new Product($conn);
+$businessModel = new Business($conn);
 
-// Get user's business_id
-$stmt = $conn->prepare("SELECT id FROM businesses WHERE user_id = ? LIMIT 1");
-$stmt->bind_param("i", $_SESSION['user_id']);
-$stmt->execute();
-$business = $stmt->get_result()->fetch_assoc();
-$business_id = $business['id'] ?? null;
-$stmt->close();
+// Get all user's businesses
+$businesses = $businessModel->getAll($current_user['id']);
+$current_business_id = isset($_GET['business_id']) ? intval($_GET['business_id']) : ($businesses[0]['id'] ?? null);
+$business_id = $current_business_id;
 
 $categories = $productModel->getCategories($business_id);
 require_once __DIR__ . '/../../includes/header.php';
@@ -26,6 +25,7 @@ require_once __DIR__ . '/../../includes/topbar.php';
             <?php endif; ?>
             <form action="../../handlers/inventory_handler.php" method="POST" class="card" style="max-width:500px; margin:auto;">
                 <input type="hidden" name="action" value="create">
+                <input type="hidden" name="business_id" value="<?= $current_business_id ?>">
                 <div class="form-group">
                     <label for="name">Product Name</label>
                     <input type="text" id="name" name="name" class="form-control" required>

@@ -7,6 +7,7 @@ $page_title = 'Add Investment/Expense';
 $businessModel = new Business($conn);
 $businesses = $businessModel->getAll($current_user['id']);
 $type = $_GET['type'] ?? 'capital';
+$current_business_id = isset($_GET['business_id']) ? intval($_GET['business_id']) : ($businesses[0]['id'] ?? null);
 require_once __DIR__ . '/../../includes/header.php';
 require_once __DIR__ . '/../../includes/sidebar.php';
 require_once __DIR__ . '/../../includes/topbar.php';
@@ -22,7 +23,7 @@ require_once __DIR__ . '/../../includes/topbar.php';
 					<label for="business_id">Business</label>
 					<select id="business_id" name="business_id" class="form-control" required>
 						<?php foreach ($businesses as $biz): ?>
-							<option value="<?= $biz['id'] ?>"><?= htmlspecialchars($biz['name']) ?></option>
+							<option value="<?= $biz['id'] ?>" <?= $current_business_id == $biz['id'] ? 'selected' : '' ?>><?= htmlspecialchars($biz['name']) ?></option>
 						<?php endforeach; ?>
 					</select>
 				</div>

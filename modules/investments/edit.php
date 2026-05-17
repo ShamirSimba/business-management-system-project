@@ -8,10 +8,12 @@ $page_title = 'Edit Investment/Expense';
 $investmentModel = new Investment($conn);
 $businessModel = new Business($conn);
 $businesses = $businessModel->getAll($current_user['id']);
+$current_business_id = isset($_GET['business_id']) ? intval($_GET['business_id']) : null;
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $investment = $investmentModel->getById($id);
 if (!$investment) {
-	header('Location: index.php');
+	$bid = $current_business_id ? '?business_id=' . $current_business_id : '';
+	header('Location: index.php' . $bid);
 	exit;
 }
 require_once __DIR__ . '/../../includes/header.php';

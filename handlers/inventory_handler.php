@@ -16,15 +16,20 @@ $stmt->close();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
+    $bid = intval($_POST['business_id'] ?? 0);
+    $bid_param = $bid ? '?business_id=' . $bid : '';
+    
     if ($action === 'create') {
         $errors = $validator->required(['name','category','cost_price','selling_price','stock_qty','low_stock_threshold'], $_POST);
         if (!empty($errors)) {
             $_SESSION['error'] = implode('<br>', $errors);
-            header('Location: ../modules/inventory/create.php');
+            header('Location: ../modules/inventory/create.php' . $bid_param);
             exit;
         }
+        // Use business_id from form or default to first business
+        $use_bid = $bid ?: $business_id;
         $data = [
-            'business_id' => $business_id,
+            'business_id' => $use_bid,
             'name' => $_POST['name'],
             'category' => $_POST['category'],
             'cost_price' => $_POST['cost_price'],
@@ -34,18 +39,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
         if ($productModel->create($data)) {
             $_SESSION['success'] = 'Product added.';
-            header('Location: ../modules/inventory/index.php');
+            header('Location: ../modules/inventory/index.php' . $bid_param);
             exit;
         } else {
             $_SESSION['error'] = 'Failed to add product.';
-            header('Location: ../modules/inventory/create.php');
+            header('Location: ../modules/inventory/create.php' . $bid_param);
             exit;
         }
     } elseif ($action === 'update') {
         $errors = $validator->required(['id','name','category','cost_price','selling_price','low_stock_threshold'], $_POST);
         if (!empty($errors)) {
             $_SESSION['error'] = implode('<br>', $errors);
-            header('Location: ../modules/inventory/edit.php?id=' . $_POST['id']);
+            header('Location: ../modules/inventory/edit.php?id=' . $_POST['id'] . $bid_param);
             exit;
         }
         $data = [
@@ -57,11 +62,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
         if ($productModel->update($_POST['id'], $data)) {
             $_SESSION['success'] = 'Product updated.';
-            header('Location: ../modules/inventory/index.php');
+            header('Location: ../modules/inventory/index.php' . $bid_param);
             exit;
         } else {
             $_SESSION['error'] = 'Failed to update product.';
-            header('Location: ../modules/inventory/edit.php?id=' . $_POST['id']);
+            header('Location: ../modules/inventory/edit.php?id=' . $_POST['id'] . $bid_param);
             exit;
         }
     } elseif ($action === 'delete') {
@@ -70,13 +75,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $_SESSION['error'] = 'Failed to delete product.';
         }
-        header('Location: ../modules/inventory/index.php');
+        header('Location: ../modules/inventory/index.php' . $bid_param);
         exit;
     } elseif ($action === 'adjust_stock') {
         $errors = $validator->required(['id','qty','reason'], $_POST);
         if (!empty($errors)) {
             $_SESSION['error'] = implode('<br>', $errors);
-            header('Location: ../modules/inventory/edit.php?id=' . $_POST['id']);
+            header('Location: ../modules/inventory/edit.php?id=' . $_POST['id'] . $bid_param);
             exit;
         }
         if ($productModel->updateStock($_POST['id'], $_POST['qty'], $_POST['reason'])) {
@@ -84,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $_SESSION['error'] = 'Failed to adjust stock.';
         }
-        header('Location: ../modules/inventory/edit.php?id=' . $_POST['id']);
+        header('Location: ../modules/inventory/edit.php?id=' . $_POST['id'] . $bid_param);
         exit;
     }
 }

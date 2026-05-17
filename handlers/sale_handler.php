@@ -19,18 +19,24 @@ $stmt->close();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     if ($action === 'create') {
+        $business_id = intval($_POST['business_id'] ?? 0);
+        if (!$business_id) {
+            $_SESSION['error'] = 'Invalid business selection.';
+            header('Location: ../modules/sales/create.php');
+            exit;
+        }
         $cart_json = $_POST['cart_json'] ?? '';
         $payment_method = $_POST['payment_method'] ?? '';
         $items = json_decode($cart_json, true);
         if (!is_array($items) || empty($items)) {
             $_SESSION['error'] = 'Cart is empty or invalid.';
-            header('Location: ../modules/sales/create.php');
+            header('Location: ../modules/sales/create.php?business_id=' . $business_id);
             exit;
         }
         $errors = $validator->required(['payment_method'], $_POST);
         if (!empty($errors)) {
             $_SESSION['error'] = implode('<br>', $errors);
-            header('Location: ../modules/sales/create.php');
+            header('Location: ../modules/sales/create.php?business_id=' . $business_id);
             exit;
         }
         // Validate items
@@ -49,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         if (!$valid) {
-            header('Location: ../modules/sales/create.php');
+            header('Location: ../modules/sales/create.php?business_id=' . $business_id);
             exit;
         }
         // Prepare sale data
@@ -61,11 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_id = $saleModel->create($sale_data, $items);
         if ($new_id) {
             $_SESSION['success'] = 'Sale recorded.';
-            header('Location: ../modules/sales/view.php?id=' . $new_id);
+            header('Location: ../modules/sales/view.php?id=' . $new_id . '&business_id=' . $business_id);
             exit;
         } else {
             $_SESSION['error'] = 'Failed to record sale.';
-            header('Location: ../modules/sales/create.php');
+            header('Location: ../modules/sales/create.php?business_id=' . $business_id);
             exit;
         }
     }

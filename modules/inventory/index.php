@@ -3,16 +3,15 @@ require_once __DIR__ . '/../../config/constants.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../classes/Product.php';
 require_once __DIR__ . '/../../auth/session.php';
+require_once __DIR__ . '/../../classes/Business.php';
 $page_title = 'Inventory Management';
 $productModel = new Product($conn);
+$businessModel = new Business($conn);
 
-// Get user's business_id
-$stmt = $conn->prepare("SELECT id FROM businesses WHERE user_id = ? LIMIT 1");
-$stmt->bind_param("i", $_SESSION['user_id']);
-$stmt->execute();
-$business = $stmt->get_result()->fetch_assoc();
-$business_id = $business['id'] ?? null;
-$stmt->close();
+// Get all user's businesses
+$businesses = $businessModel->getAll($current_user['id']);
+$current_business_id = isset($_GET['business_id']) ? intval($_GET['business_id']) : ($businesses[0]['id'] ?? null);
+$business_id = $current_business_id;
 
 $category_filter = $_GET['category'] ?? '';
 $search = $_GET['search'] ?? '';
@@ -24,9 +23,10 @@ require_once __DIR__ . '/../../includes/sidebar.php';
         <div class="container">
             <div class="flex justify-between align-center mb-3">
                 <h2>Inventory Management</h2>
-                <a href="create.php" class="btn btn-primary">Add Product</a>
+                <a href="create.php?business_id=<?= $current_business_id ?>" class="btn btn-primary">Add Product</a>
             </div>
             <form method="GET" class="flex gap-1 mb-2">
+                <input type="hidden" name="business_id" value="<?= $current_business_id ?>">
                 <input type="text" name="search" placeholder="Search products..." value="<?= htmlspecialchars($search) ?>" class="form-control" style="max-width:200px;">
                 <select name="category" class="form-control" style="max-width:180px;">
                     <option value="">All Categories</option>
@@ -77,10 +77,11 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                                     <td><?= $prod['low_stock_threshold'] ?></td>
                                     <td><span class="badge <?= $badge ?>"><?= $status ?></span></td>
                                     <td>
-                                        <a href="edit.php?id=<?= $prod['id'] ?>" class="btn btn-success">Edit</a>
+                                        <a href="edit.php?id=<?= $prod['id'] ?>&business_id=<?= $current_business_id ?>" class="btn btn-success">Edit</a>
                                         <form action="../../handlers/inventory_handler.php" method="POST" style="display:inline;">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="id" value="<?= $prod['id'] ?>">
+                                            <input type="hidden" name="business_id" value="<?= $current_business_id ?>">
                                             <button type="submit" class="btn btn-danger" data-confirm-delete>Delete</button>
                                         </form>
                                     </td>

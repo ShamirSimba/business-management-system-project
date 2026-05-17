@@ -22,7 +22,7 @@ class Sale {
             
             // Insert sale with calculated total
             $stmt = $this->conn->prepare("INSERT INTO sales (business_id, user_id, total_amount, payment_method, status) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("iidsS", 
+            $stmt->bind_param("iidss", 
                 $sale_data['business_id'], 
                 $sale_data['user_id'], 
                 $total_amount, 
