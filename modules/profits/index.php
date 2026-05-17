@@ -85,11 +85,15 @@ include_once '../../includes/layout-start.php';
             <div class="flex gap-2">
                 <div class="card" style="flex:1;">
                     <h3>Yearly Profit Trend</h3>
-                    <canvas id="profit-chart"></canvas>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="profit-chart"></canvas>
+                    </div>
                 </div>
                 <div class="card" style="flex:1;">
                     <h3>Revenue vs Expenses</h3>
-                    <canvas id="comparison-chart"></canvas>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="comparison-chart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -115,10 +119,23 @@ new Chart(ctx1, {
             borderColor: '#10b981',
             backgroundColor: 'rgba(16, 185, 129, 0.1)',
             fill: true,
-            tension: 0.4
+            tension: 0.4,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 5
         }]
     },
-    options: { responsive: true, maintainAspectRatio: false }
+    options: { 
+        responsive: true, 
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: true, position: 'top' }
+        },
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
 });
 
 // Revenue vs Expenses
@@ -134,7 +151,16 @@ new Chart(ctx2, {
             { label: 'Expenses', data: expensesData, backgroundColor: '#ef4444' }
         ]
     },
-    options: { responsive: true, maintainAspectRatio: false }
+    options: { 
+        responsive: true, 
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: true, position: 'top' }
+        },
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
 });
 </script>
 <?php include_once '../../includes/footer.php'; ?>

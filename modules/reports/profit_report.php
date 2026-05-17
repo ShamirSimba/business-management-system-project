@@ -16,7 +16,7 @@ $business_id = $current_business_id;
 $from = $_GET['from'] ?? date('Y-m-01');
 $to = $_GET['to'] ?? date('Y-m-d');
 $profit_data = isset($_GET['from']) ? $profitModel->calculate($business_id, $from, $to) : null;
-$monthly = isset($_GET['from']) ? [] : [];
+$monthly = isset($_GET['from']) ? $profitModel->getMonthlyBreakdown($business_id, date('Y', strtotime($from))) : [];
 require_once __DIR__ . '/../../includes/header.php';
 require_once __DIR__ . '/../../includes/sidebar.php';
 require_once __DIR__ . '/../../includes/topbar.php';
@@ -92,6 +92,7 @@ function exportPDF(type) {
     form.innerHTML = `
         <input type="hidden" name="report_type" value="${type}">
         <input type="hidden" name="format" value="pdf">
+        <input type="hidden" name="business_id" value="<?= $business_id ?>">
         <input type="hidden" name="from" value="<?= $from ?>">
         <input type="hidden" name="to" value="<?= $to ?>">
     `;
@@ -107,6 +108,7 @@ function exportExcel(type) {
     form.innerHTML = `
         <input type="hidden" name="report_type" value="${type}">
         <input type="hidden" name="format" value="excel">
+        <input type="hidden" name="business_id" value="<?= $business_id ?>">
         <input type="hidden" name="from" value="<?= $from ?>">
         <input type="hidden" name="to" value="<?= $to ?>">
     `;

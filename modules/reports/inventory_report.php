@@ -87,6 +87,7 @@ function exportPDF(type) {
     form.innerHTML = `
         <input type="hidden" name="report_type" value="${type}">
         <input type="hidden" name="format" value="pdf">
+        <input type="hidden" name="business_id" value="<?= $business_id ?>">
         <input type="hidden" name="category" value="<?= $category_filter ?>">
     `;
     document.body.appendChild(form);
@@ -101,6 +102,7 @@ function exportExcel(type) {
     form.innerHTML = `
         <input type="hidden" name="report_type" value="${type}">
         <input type="hidden" name="format" value="excel">
+        <input type="hidden" name="business_id" value="<?= $business_id ?>">
         <input type="hidden" name="category" value="<?= $category_filter ?>">
     `;
     document.body.appendChild(form);

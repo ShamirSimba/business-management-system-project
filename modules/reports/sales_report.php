@@ -82,10 +82,10 @@ require_once __DIR__ . '/../../includes/topbar.php';
                         <tbody>
                             <?php foreach ($sales as $sale): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($sale['date']) ?></td>
+                                    <td><?= date('Y-m-d H:i', strtotime($sale['created_at'])) ?></td>
                                     <td><?= $sale['id'] ?></td>
-                                    <td><?= $sale['items_count'] ?></td>
-                                    <td>TZS <?= number_format($sale['total'], 2) ?></td>
+                                    <td><?= $total_items ?></td>
+                                    <td>TZS <?= number_format($sale['total_amount'], 2) ?></td>
                                     <td><span class="badge badge-info"><?= ucfirst($sale['payment_method']) ?></span></td>
                                 </tr>
                             <?php endforeach; ?>
@@ -109,6 +109,7 @@ function exportPDF(type) {
     form.innerHTML = `
         <input type="hidden" name="report_type" value="${type}">
         <input type="hidden" name="format" value="pdf">
+        <input type="hidden" name="business_id" value="<?= $business_id ?>">
         <input type="hidden" name="from" value="<?= $from ?>">
         <input type="hidden" name="to" value="<?= $to ?>">
         <input type="hidden" name="payment_method" value="<?= $payment_method ?>">
@@ -125,6 +126,7 @@ function exportExcel(type) {
     form.innerHTML = `
         <input type="hidden" name="report_type" value="${type}">
         <input type="hidden" name="format" value="excel">
+        <input type="hidden" name="business_id" value="<?= $business_id ?>">
         <input type="hidden" name="from" value="<?= $from ?>">
         <input type="hidden" name="to" value="<?= $to ?>">
         <input type="hidden" name="payment_method" value="<?= $payment_method ?>">

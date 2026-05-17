@@ -19,7 +19,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
         <div class="container">
             <div class="flex justify-between align-center mb-3">
                 <h2>Record New Sale</h2>
-                <a href="index.php?business_id=<?= $current_business_id ?>" class="btn btn-secondary">View Sales History</a>
+                <a href="index.php?business_id=<?= $current_business_id ?>" class="btn btn-primary">View Sales History</a>
             </div>
             
             <?php if (isset($_SESSION['error'])): ?>

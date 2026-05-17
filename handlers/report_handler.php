@@ -4,71 +4,62 @@ require_once '../classes/Sale.php';
 require_once '../classes/Product.php';
 require_once '../classes/Profit.php';
 require_once '../classes/Report.php';
-session_start();
+require_once '../auth/session.php';
 
 $report_type = $_POST['report_type'] ?? '';
 $format = $_POST['format'] ?? 'pdf';
-$user_id = $_SESSION['user']['id'] ?? null;
+$business_id = $_POST['business_id'] ?? 0;
 
-if (!$user_id) {
-    die('Unauthorized');
+if (!$business_id) {
+    die('Business ID is required');
 }
 
 $reportModel = new Report($conn);
-$filename = '';
 
-if ($report_type === 'sales') {
-    $from = $_POST['from'] ?? date('Y-m-01');
-    $to = $_POST['to'] ?? date('Y-m-d');
-    $payment_method = $_POST['payment_method'] ?? '';
-    
-    $saleModel = new Sale($conn);
-    $sales = $saleModel->getAll($user_id, $from, $to, $payment_method);
-    
-    $filename = 'Sales_Report_' . date('YmdHis') . ($format === 'pdf' ? '.pdf' : '.xlsx');
-    
-    if ($format === 'pdf') {
-        $reportModel->exportSalesToPDF($sales, $filename);
+try {
+    if ($report_type === 'sales') {
+        $from = $_POST['from'] ?? date('Y-m-01');
+        $to = $_POST['to'] ?? date('Y-m-d');
+        $payment_method = $_POST['payment_method'] ?? '';
+        
+        $saleModel = new Sale($conn);
+        $sales = $saleModel->getAll($business_id, $from, $to, $payment_method);
+        
+        if ($format === 'pdf') {
+            $reportModel->exportSalesToPDF($sales, $from, $to, $payment_method);
+        } else {
+            $reportModel->exportSalesToExcel($sales, $from, $to, $payment_method);
+        }
+        
+    } elseif ($report_type === 'inventory') {
+        $category = $_POST['category'] ?? '';
+        
+        $productModel = new Product($conn);
+        $products = $productModel->getAll($business_id, $category);
+        
+        if ($format === 'pdf') {
+            $reportModel->exportInventoryToPDF($products, $category);
+        } else {
+            $reportModel->exportInventoryToExcel($products, $category);
+        }
+        
+    } elseif ($report_type === 'profit') {
+        $from = $_POST['from'] ?? date('Y-m-01');
+        $to = $_POST['to'] ?? date('Y-m-d');
+        
+        $profitModel = new Profit($conn);
+        $profit_data = $profitModel->calculate($business_id, $from, $to);
+        $monthly = $profitModel->getMonthlyBreakdown($business_id, date('Y', strtotime($from)));
+        
+        if ($format === 'pdf') {
+            $reportModel->exportProfitToPDF($profit_data, $monthly, $from, $to);
+        } else {
+            $reportModel->exportProfitToExcel($profit_data, $monthly, $from, $to);
+        }
     } else {
-        $reportModel->exportSalesToExcel($sales, $filename);
+        die('Invalid report type');
     }
-    
-} elseif ($report_type === 'inventory') {
-    $category = $_POST['category'] ?? '';
-    
-    $productModel = new Product($conn);
-    $products = $productModel->getAll($user_id, $category);
-    
-    $filename = 'Inventory_Report_' . date('YmdHis') . ($format === 'pdf' ? '.pdf' : '.xlsx');
-    
-    if ($format === 'pdf') {
-        $reportModel->exportInventoryToPDF($products, $filename);
-    } else {
-        $reportModel->exportInventoryToExcel($products, $filename);
-    }
-    
-} elseif ($report_type === 'profit') {
-    $from = $_POST['from'] ?? date('Y-m-01');
-    $to = $_POST['to'] ?? date('Y-m-d');
-    
-    $profitModel = new Profit($conn);
-    $profit_data = $profitModel->calculateDateRange($user_id, $from, $to);
-    $monthly = $profitModel->getMonthlyBreakdownRange($user_id, $from, $to);
-    
-    $filename = 'Profit_Report_' . date('YmdHis') . ($format === 'pdf' ? '.pdf' : '.xlsx');
-    
-    if ($format === 'pdf') {
-        $reportModel->exportProfitToPDF($profit_data, $monthly, $filename);
-    } else {
-        $reportModel->exportProfitToExcel($profit_data, $monthly, $filename);
-    }
-}
-
-// Output file for download
-if ($filename && file_exists('../exports/' . $filename)) {
-    header('Content-Type: application/' . ($format === 'pdf' ? 'pdf' : 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'));
-    header('Content-Disposition: attachment; filename="' . $filename . '"');
-    header('Content-Length: ' . filesize('../exports/' . $filename));
-    readfile('../exports/' . $filename);
-    exit;
+} catch (Exception $e) {
+    error_log("Report generation error: " . $e->getMessage());
+    die("Error generating report: " . $e->getMessage());
 }
